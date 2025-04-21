@@ -1,0 +1,67 @@
+🟢 i. Data Preparation
+python
+Copy
+Edit
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Load and split data
+iris = load_iris()
+X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)
+
+# Scale features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+🟢 ii. Model Training
+python
+Copy
+Edit
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Train baseline model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Evaluate
+y_pred = model.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
+print("Accuracy (baseline):", acc)
+🟢 iii. Hyperparameter Tuning
+Try changing regularization strength C:
+
+python
+Copy
+Edit
+# Try different values of C (inverse regularization)
+for i, c in enumerate([0.01, 0.1, 1, 10]):
+    model = LogisticRegression(C=c)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    print(f"Model_v{i+1} | C={c} | Accuracy={acc:.2f}")
+🟢 iv. Record the Results
+You can simply log them in a .txt or .csv file:
+
+python
+Copy
+Edit
+results = []
+for i, c in enumerate([0.01, 0.1, 1, 10]):
+    model = LogisticRegression(C=c)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    results.append((f"model_v{i+1}", c, acc))
+    print(f"Saved model_v{i+1}.pkl")
+
+    # Save model
+    import joblib
+    joblib.dump(model, f"model_v{i+1}.pkl")
+
+# Save results to CSV
+import pandas as pd
+df = pd.DataFrame(results, columns=["Model", "C", "Accuracy"])
+df.to_csv("model_results.csv", index=False)
